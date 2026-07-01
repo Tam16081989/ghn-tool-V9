@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GHN Auto Gán Tài Xế v4</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1923;color:#e2e8f0;min-height:100vh}
+header{background:linear-gradient(90deg,#d4380d,#fa541c);padding:14px 28px;display:flex;align-items:center;gap:14px}
+header .logo{font-size:20px;font-weight:800;color:#fff}
+header .sub{font-size:12px;color:#ffe7ba;margin-top:2px}
+.tabs{display:flex;background:#162130;border-bottom:2px solid #d4380d;overflow-x:auto}
+.tab-btn{padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;border:none;background:none;color:#94a3b8;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s}
+.tab-btn.active{color:#fa541c;border-bottom-color:#fa541c;background:#1e2d3d}
+.tab-btn:hover:not(.active){color:#e2e8f0;background:#1a2535}
+.pane{display:none;padding:20px;max-width:1200px;margin:0 auto}
+.pane.active{display:block}
+.card{background:#162130;border:1px solid #1e3a5f;border-radius:10px;padding:18px;margin-bottom:16px}
+.card h3{font-size:12px;font-weight:700;color:#fa541c;margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase}
+label{display:block;font-size:12px;color:#94a3b8;margin-bottom:4px;font-weight:600}
+input,select{width:100%;padding:8px 11px;border-radius:6px;border:1px solid #1e3a5f;background:#0f1923;color:#e2e8f0;font-size:13px;margin-bottom:10px;outline:none}
+input:focus,select:focus{border-color:#fa541c}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .2s;margin-right:8px;margin-bottom:6px}
+.bp{background:#fa541c;color:#fff}.bp:hover{background:#d4380d}
+.bs{background:#1e3a5f;color:#93c5fd}.bs:hover{background:#254a73}
+.bg2{background:#16a34a;color:#fff}.bg2:hover{background:#15803d}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:160px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1e3a5f;padding:9px 11px;text-align:left;font-size:11px;color:#93c5fd;text-transform:uppercase;letter-spacing:.4px}
+td{padding:7px 10px;border-bottom:1px solid #1a2e44;vertical-align:middle}
+tr:hover td{background:#1a2e44}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bg{background:#14532d;color:#4ade80}
+.by{background:#451a03;color:#fbbf24}
+.br{background:#450a0a;color:#f87171}
+.bb{background:#1e3a5f;color:#60a5fa}
+.bgr{background:#1e293b;color:#94a3b8}
+.pwrap{background:#0f1923;border-radius:8px;height:10px;margin:6px 0;overflow:hidden}
+.pbar{height:100%;background:linear-gradient(90deg,#fa541c,#fbbf24);border-radius:8px;transition:width .4s}
+#logBox{background:#0a1520;border:1px solid #1e3a5f;border-radius:8px;padding:10px;height:180px;overflow-y:auto;font-size:12px;font-family:Consolas,monospace;color:#94a3b8}
+.lok{color:#4ade80}.lerr{color:#f87171}.linfo{color:#60a5fa}.lwarn{color:#fbbf24}
+.srow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.sc{flex:1;min-width:90px;background:#1e3a5f22;border:1px solid #1e3a5f;border-radius:8px;padding:12px;text-align:center}
+.sn{font-size:24px;font-weight:800;color:#fa541c}
+.sl{font-size:11px;color:#64748b;margin-top:2px}
+.alert{padding:9px 13px;border-radius:6px;font-size:13px;margin-bottom:12px}
+.ai{background:#1e3a5f;border-left:4px solid #3b82f6;color:#93c5fd}
+.aw{background:#451a0322;border-left:4px solid #f59e0b;color:#fbbf24}
+.ao{background:#14532d22;border-left:4px solid #22c55e;color:#4ade80}
+.mok{background:#14532d15}.mwarn{background:#451a0315}
+input.ei{width:100%;padding:4px 7px;font-size:12px;border-radius:4px;border:1px solid #1e3a5f;background:#0f1923;color:#e2e8f0;margin-bottom:0}
+.stitle{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid #1e3a5f}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">🚚 GHN Auto Gán Tài Xế — Lịch Vận Hành Hàng Ngày</div>
+    <div class="sub">A=Tên tuyến · B=Tên TX · C=Số ĐT · D=BKS · Trang tính1</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="go('data')">📋 Dữ Liệu Tài Xế</button>
+  <button class="tab-btn" onclick="go('api')">⚙ Cấu Hình API</button>
+  <button class="tab-btn" onclick="go('trips')">🚛 Chuyến Chờ</button>
+  <button class="tab-btn" onclick="go('assign')">✅ Gán & Xác Nhận</button>
+</div>
+
+<div id="pane-data" class="pane active">
+
+  <!-- UPLOAD BOX -->
+  <div class="card" id="uploadCard">
+    <h3>📂 Cập Nhật Dữ Liệu Từ File Google Sheet</h3>
+    <p style="font-size:13px;color:#94a3b8;margin-bottom:14px">
+      Xuất file từ Google Sheet → tải lên đây. App sẽ tự đọc và thay thế dữ liệu.
+    </p>
+
+    <!-- Hướng dẫn xuất file -->
+    <div style="background:#0f1923;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;color:#64748b;line-height:1.8">
+      <b style="color:#fbbf24">📌 Cách xuất file từ Google Sheet:</b><br>
+      Google Sheet → menu <b style="color:#e2e8f0">Tệp</b> → <b style="color:#e2e8f0">Tải xuống</b> → chọn <b style="color:#4ade80">Giá trị được phân tách bằng dấu phẩy (.csv)</b><br>
+      <span style="color:#60a5fa">Đảm bảo thứ tự cột: A=Tên tuyến · B=Tên TX · C=Số ĐT · D=BKS</span>
+    </div>
+
+    <!-- Drop zone -->
+    <div id="dropZone"
+      onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.style.borderColor='#fa541c';this.style.background='#1e2d3d'"
+      ondragleave="this.style.borderColor='#1e3a5f';this.style.background='#0f1923'"
+      ondrop="handleDrop(event)"
+      style="border:2px dashed #1e3a5f;border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;background:#0f1923">
+      <div style="font-size:36px;margin-bottom:8px">📁</div>
+      <div style="font-size:14px;font-weight:600;color:#e2e8f0;margin-bottom:4px">Kéo thả file vào đây hoặc nhấn để chọn</div>
+      <div style="font-size:12px;color:#64748b">Hỗ trợ: <b>.csv</b> (xuất từ Google Sheet)</div>
+      <input type="file" id="fileInput" accept=".csv,.tsv,.txt" style="display:none" onchange="handleFile(this.files[0])"/>
+    </div>
+
+    <!-- Map cột -->
+    <div id="colMapWrap" style="display:none;margin-top:14px">
+      <div style="font-size:12px;color:#fbbf24;margin-bottom:8px;font-weight:600">⚙ Chọn đúng cột trong file CSV của bạn:</div>
+      <div class="row">
+        <div class="col">
+          <label>Cột Tên Tuyến</label>
+          <select id="mapTuyen"></select>
+        </div>
+        <div class="col">
+          <label>Cột Tên Tài Xế</label>
+          <select id="mapTen"></select>
+        </div>
+        <div class="col">
+          <label>Cột Số ĐT</label>
+          <select id="mapSdt"></select>
+        </div>
+        <div class="col">
+          <label>Cột BKS Xe</label>
+          <select id="mapBks"></select>
+        </div>
+      </div>
+      <button class="btn bg2" onclick="applyImport()">✅ Xác nhận nhập dữ liệu</button>
+      <button class="btn bs" onclick="document.getElementById('colMapWrap').style.display='none'">Hủy</button>
+    </div>
+
+    <div id="uploadMsg" style="margin-top:10px;font-size:13px"></div>
+  </div>
+
+  <div class="alert ao" id="dataAlert">✅ Đã nhúng <b id="totalRows">0</b> tài xế. Bạn có thể chỉnh sửa trực tiếp hoặc upload file mới bên trên.</div>
+  <div class="srow">
+    <div class="sc"><div class="sn" id="st1">0</div><div class="sl">Tổng tài xế</div></div>
+    <div class="sc"><div class="sn" id="st2">0</div><div class="sl">Có SĐT</div></div>
+    <div class="sc"><div class="sn" id="st3">0</div><div class="sl">Có BKS</div></div>
+    <div class="sc"><div class="sn" id="st4">0</div><div class="sl">Sẵn sàng gán</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="stitle" style="margin:0;border:0;padding:0">Danh sách tài xế theo tuyến</div>
+      <div>
+        <button class="btn bs" onclick="addRow()">➕ Thêm tuyến</button>
+        <button class="btn bp" onclick="go('trips')">Tiếp: Chuyến Chờ →</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>#</th>
+          <th>A · Tên Tuyến</th>
+          <th>B · Tên Tài Xế</th>
+          <th>C · Số ĐT</th>
+          <th>D · BKS Xe</th>
+          <th>Trạng thái</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="pane-api" class="pane">
+  <div class="card">
+    <h3>🔐 Thông Tin API GHN Nội Bộ</h3>
+    <div class="alert aw">⚠ Liên hệ bộ phận IT GHN để lấy Base URL API và xác nhận tên các field trong body request.</div>
+    <div class="row">
+      <div class="col">
+        <label>Base URL API</label>
+        <input id="apiBase" placeholder="https://truck-gw.ghn.vn" value="https://truck-gw.ghn.vn"/>
+      </div>
+      <div class="col">
+        <label>Bearer Token</label>
+        <input id="bearerToken" type="password" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXAiOiJjb29yZGluYXRvciIsImNpZCI6MjA5MiwiaGlkIjoiTEhDTSIsIm5vYyI6IlRy4bqnbiBMw6ogSG_DoG5nIFTDom0iLCJwb2MiOiIwOTE5OTExODcwIiwiZXhwIjoxNzgxMjA2MjA5fQ.gUx-cFXDBPoJ8RJdGkaOsB17GzkmzcRlkbyh134OTqo"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Partner Router Code (lọc chuyến theo hub)</label>
+        <input id="hubId" value="1100" placeholder="VD: 1100"/>
+      </div>
+      <div class="col">
+        <label>Endpoint lấy chuyến chờ</label>
+        <input id="epTrips" value="/api/v1/staff/trip/find_trip"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Endpoint phân bổ tài xế</label>
+        <input id="epAssign" value="/api/v1/staff/trip/express/assign/"/>
+      </div>
+      <div class="col">
+        <label>Phương thức HTTP</label>
+        <select id="method"><option>POST</option><option selected>PUT</option><option>PATCH</option></select>
+      </div>
+    </div>
+    <div class="card" style="margin-top:4px;background:#0f1923">
+      <h3>📦 Cấu trúc body gửi lên API (chỉnh nếu cần)</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:10px">Body gửi lên API khi gán tài xế. Điền đúng tên field theo tài liệu GHN nội bộ.</p>
+    <div style="background:#14532d22;border-left:3px solid #22c55e;border-radius:6px;padding:8px 12px;font-size:11px;color:#4ade80;margin-bottom:10px">
+      ✅ Đã phát hiện:<br>
+      • <b>Tìm tài xế:</b> GET https://truck-gw.ghn.vn/api/v2/public/driver/find?search_field={sdt}&hub=LHCM<br>
+      • <b>Lấy chuyến:</b> PATCH https://truck-gw.ghn.vn/api/v1/staff/trip/find_trip<br>
+      • <b>Gán tài xế:</b> PUT /api/v1/staff/trip/express/assign/{trip_code} ✅
+    </div>
+      <textarea id="bodyTemplate" style="width:100%;background:#162130;color:#e2e8f0;border:1px solid #1e3a5f;border-radius:6px;padding:10px;font-family:Consolas,monospace;font-size:12px;height:140px;outline:none">{
+  "driver_phone": "{{sdt}}",
+  "license_plate": "{{bks}}",
+  "driver_name": "{{ten}}"
+}</textarea>
+    </div>
+  </div>
+</div>
+
+<div id="pane-trips" class="pane">
+  <div class="card">
+    <div style="margin-bottom:12px">
+      <button class="btn bp" onclick="loadTrips()">📡 Tải Chuyến Chờ Từ API</button>
+      <button class="btn bs" onclick="loadSample()">🧪 Dùng Chuyến Mẫu (Test)</button>
+      <button class="btn bg2" id="btnMatch" onclick="doMatch()" disabled>⚡ Tự Động Ghép Tài Xế</button>
+    </div>
+    <div id="tripsWrap">
+      <div class="alert ai">Nhấn "📡 Tải Chuyến Chờ" nếu có API, hoặc "🧪 Dùng Chuyến Mẫu" để test toàn bộ flow.</div>
+    </div>
+  </div>
+</div>
+
+<div id="pane-assign" class="pane">
+  <div class="srow" id="astats" style="display:none">
+    <div class="sc"><div class="sn" id="a1">0</div><div class="sl">Tổng ghép</div></div>
+    <div class="sc"><div class="sn" id="a2">0</div><div class="sl">✅ Khớp</div></div>
+    <div class="sc"><div class="sn" id="a3">0</div><div class="sl">⚠ Chưa khớp</div></div>
+    <div class="sc"><div class="sn" id="a4">0</div><div class="sl">🎉 Đã gán xong</div></div>
+  </div>
+  <div class="card" id="matchCard" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="stitle" style="margin:0;border:0;padding:0">Xem trước: Tuyến API ↔ Tài Xế</div>
+      <button class="btn bp" id="btnGan" onclick="startAssign()">🚀 Bắt Đầu Phân Bổ</button>
+    </div>
+    <div id="matchWrap" style="overflow-x:auto"></div>
+  </div>
+  <div class="card" id="progCard" style="display:none">
+    <h3>⏳ Tiến Trình Phân Bổ</h3>
+    <div id="progTxt" style="font-size:13px;color:#94a3b8;margin-bottom:5px">Chuẩn bị...</div>
+    <div class="pwrap"><div class="pbar" id="pbar" style="width:0%"></div></div>
+    <div id="progCnt" style="font-size:11px;color:#64748b;margin-top:3px"></div>
+  </div>
+  <div class="card">
+    <h3>📋 Nhật Ký Thời Gian Thực</h3>
+    <div id="logBox"></div>
+    <button class="btn bs" onclick="document.getElementById('logBox').innerHTML=''" style="margin-top:8px">🗑 Xóa Log</button>
+  </div>
+</div>
+
+<script>
+// ========== DỮ LIỆU THẬT TỪ GOOGLE SHEET ==========
+// A=Tên tuyến | B=Tên TX | C=Số ĐT | D=BKS
+// Thêm BKS khi bạn có — để trống tạm thời nếu chưa nhập
+let sheetData = [
+  {tuyen:"KienGiang_S_4",    ten:"Lê Văn Bình",        sdt:"0343606979", bks:""},
+  {tuyen:"CaMau_S_8",        ten:"Ngô Phú Vinh",        sdt:"0846095939", bks:""},
+  {tuyen:"CanTho_GXT_S1_01", ten:"Lâm Thế Ngọc",        sdt:"0979140553", bks:""},
+  {tuyen:"CanTho_GXT_S1_02", ten:"Lê Văn Cương",        sdt:"0944364036", bks:""},
+  {tuyen:"CanTho_GXT_S1_03", ten:"Thạch Thanh Vinh",    sdt:"0398744385", bks:""},
+  {tuyen:"CanTho_GXT_S1_04", ten:"Lê Hoàng Thiên",      sdt:"0949221639", bks:""},
+  {tuyen:"CanTho_GXT_S1_05", ten:"Nguyễn Kinh Thơ",     sdt:"0762111167", bks:""},
+  {tuyen:"CanTho_S1_01",     ten:"Nguyễn Văn Tấn",      sdt:"0949939318", bks:""},
+  {tuyen:"CanTho_S1_02",     ten:"Hà Hữu Thường",       sdt:"0907950052", bks:""},
+  {tuyen:"CanTho_S1_03",     ten:"Huỳnh Thái An",       sdt:"0962565214", bks:""},
+  {tuyen:"CanTho_S1_04",     ten:"Nguyễn Văn Lợi",      sdt:"0776742447", bks:""},
+  {tuyen:"CanTho_S1_05",     ten:"Huỳnh Hữu Tài",       sdt:"0769391430", bks:""},
+  {tuyen:"CanTho_S1_06",     ten:"Trần Huỳnh Long",     sdt:"0369758231", bks:""},
+  {tuyen:"CanTho_S1_08",     ten:"Tiêu Thành Phát",     sdt:"0929655858", bks:""},
+  {tuyen:"CanTho_S1_10",     ten:"Lê Hoàng Phú",        sdt:"0523377972", bks:""},
+  {tuyen:"CanTho_S1_12",     ten:"Bùi Xuân Tiến",       sdt:"0766900653", bks:""},
+  {tuyen:"CanTho_S1_15",     ten:"Nguyễn Văn Sơn",      sdt:"0787449777", bks:""},
+  {tuyen:"CanTho_S1_16",     ten:"Nguyễn Chí Khang",    sdt:"0916908711", bks:""},
+  {tuyen:"CanTho_S1_18",     ten:"Đào Thiện Du",        sdt:"0964706010", bks:""},
+  {tuyen:"CanTho_S1_19",     ten:"Nguyễn Trọng Ngôn",   sdt:"0372818831", bks:""},
+  {tuyen:"CanTho_S1_20",     ten:"Nguyễn Minh Thiện",   sdt:"0779807787", bks:""},
+  {tuyen:"CanTho_S1_23",     ten:"Đặng Thành Công",     sdt:"0938197522", bks:""},
+  {tuyen:"CanTho_S1_25",     ten:"Huỳnh Thanh Điền",    sdt:"0939271179", bks:""},
+  // === Dán thêm dòng từ sheet vào đây nếu còn ===
+];
+
+let tripsData=[], matchPairs=[], assignRes={};
+
+// ===== CSV UPLOAD =====
+let csvRows=[], csvHeaders=[];
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone').style.borderColor='#1e3a5f';
+  document.getElementById('dropZone').style.background='#0f1923';
+  const f=e.dataTransfer.files[0];
+  if(f) handleFile(f);
+}
+
+function handleFile(f){
+  if(!f){return;}
+  if(!f.name.match(/\.(csv|tsv|txt)$/i)){
+    showUploadMsg('❌ Chỉ hỗ trợ file .csv — Xuất từ Google Sheet → Tệp → Tải xuống → CSV','err');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const text=e.target.result;
+      parseCSVPreview(text, f.name);
+    }catch(err){
+      showUploadMsg('❌ Lỗi đọc file: '+err.message,'err');
+    }
+  };
+  reader.readAsText(f,'UTF-8');
+}
+
+function parseCSVRaw(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  return lines.map(line=>{
+    const fields=[];let cur='',inQ=false;
+    for(let ch of line){
+      if(ch==='"'){inQ=!inQ;}
+      else if((ch===','||ch==='\t')&&!inQ){fields.push(cur.trim());cur='';}
+      else cur+=ch;
+    }
+    fields.push(cur.trim());
+    return fields.map(f=>f.replace(/^"|"$/g,'').trim());
+  });
+}
+
+function parseCSVPreview(text, fname){
+  const rows=parseCSVRaw(text);
+  if(rows.length<2){showUploadMsg('❌ File không có dữ liệu','err');return;}
+  csvHeaders=rows[0];
+  csvRows=rows.slice(1).filter(r=>r.some(c=>c));
+
+  // Auto detect columns by header name
+  const h=csvHeaders.map(x=>x.toLowerCase());
+  const guess=(kw)=>{
+    const idx=h.findIndex(x=>kw.some(k=>x.includes(k)));
+    return idx>=0?idx:0;
+  };
+  const gTuyen=guess(['tuyến','tuyen','route','tên tuyến']);
+  const gTen=guess(['tên tx','ten tx','tài xế','tai xe','driver','tên tài','ten tai']);
+  const gSdt=guess(['sđt','sdt','điện thoại','dien thoai','phone','số đt','so dt']);
+  const gBks=guess(['bks','biển số','bien so','plate','xe']);
+
+  // Fill selects
+  ['mapTuyen','mapTen','mapSdt','mapBks'].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML=csvHeaders.map((h,i)=>`<option value="${i}">${h||'Cột '+(i+1)}</option>`).join('');
+  });
+  document.getElementById('mapTuyen').value=gTuyen;
+  document.getElementById('mapTen').value=gTen;
+  document.getElementById('mapSdt').value=gSdt;
+  document.getElementById('mapBks').value=gBks;
+
+  document.getElementById('colMapWrap').style.display='block';
+  showUploadMsg(`📄 Đọc được <b>${csvRows.length} dòng</b> từ file <b>${fname}</b> · ${csvHeaders.length} cột. Kiểm tra mapping cột bên dưới rồi nhấn "Xác nhận".`,'ok');
+}
+
+function applyImport(){
+  const iT=+document.getElementById('mapTuyen').value;
+  const iN=+document.getElementById('mapTen').value;
+  const iS=+document.getElementById('mapSdt').value;
+  const iB=+document.getElementById('mapBks').value;
+
+  const newData=csvRows
+    .map(r=>({tuyen:(r[iT]||'').trim(),ten:(r[iN]||'').trim(),sdt:(r[iS]||'').trim(),bks:(r[iB]||'').trim()}))
+    .filter(r=>r.tuyen);
+
+  if(!newData.length){showUploadMsg('❌ Không đọc được dữ liệu — kiểm tra lại cột Tên tuyến','err');return;}
+
+  sheetData=newData;
+  renderSheet();
+  document.getElementById('colMapWrap').style.display='none';
+  showUploadMsg(`✅ Đã nhập <b>${newData.length} tài xế</b> từ file CSV thành công!`,'ok');
+  log('Upload CSV: '+newData.length+' tài xế','ok');
+}
+
+function showUploadMsg(msg,t){
+  const el=document.getElementById('uploadMsg');
+  const colors={ok:'#4ade80',err:'#f87171',warn:'#fbbf24'};
+  el.style.color=colors[t]||'#94a3b8';
+  el.innerHTML=msg;
+}
+
+function go(id){
+  ['data','api','trips','assign'].forEach((x,i)=>{
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active',x===id);
+    document.getElementById('pane-'+x).classList.toggle('active',x===id);
+  });
+  if(id==='data') renderSheet();
+  if(id==='assign'&&matchPairs.length) renderMatch();
+}
+
+function log(m,t='info'){
+  const b=document.getElementById('logBox');
+  const ts=new Date().toLocaleTimeString('vi-VN');
+  const c={ok:'lok',err:'lerr',info:'linfo',warn:'lwarn'}[t]||'';
+  b.innerHTML+=`<div class="${c}">[${ts}] ${m}</div>`;
+  b.scrollTop=b.scrollHeight;
+}
+
+function renderSheet(){
+  document.getElementById('totalRows').textContent=sheetData.length;
+  const tb=document.getElementById('tbody');
+  tb.innerHTML='';
+  sheetData.forEach((r,i)=>{
+    const hasSdt=!!(r.sdt&&r.sdt.trim());
+    const hasBks=!!(r.bks&&r.bks.trim());
+    const hasTuyen=!!(r.tuyen&&r.tuyen.trim());
+    const ready=hasTuyen&&hasSdt&&hasBks;
+    const miss=[];
+    if(!hasSdt) miss.push('SĐT');
+    if(!hasBks) miss.push('BKS');
+    if(!hasTuyen) miss.push('Tuyến');
+    const badge=ready
+      ? `<span class="badge bg">✅ Đủ info</span>`
+      : `<span class="badge br">❌ Thiếu ${miss.join(', ')}</span>`;
+    tb.innerHTML+=`<tr style="${!ready?'background:#450a0a18':''}">
+      <td style="color:#64748b;font-size:12px">${i+1}</td>
+      <td><input class="ei" value="${esc(r.tuyen)}" oninput="sheetData[${i}].tuyen=this.value;updateStats()"/></td>
+      <td><input class="ei" value="${esc(r.ten)}" oninput="sheetData[${i}].ten=this.value"/></td>
+      <td><input class="ei" value="${esc(r.sdt)}" placeholder="09xxxxxxxx" oninput="sheetData[${i}].sdt=this.value;updateStats()" style="font-family:monospace;${!hasSdt?'border-color:#f87171':''}"/></td>
+      <td><input class="ei" value="${esc(r.bks)}" placeholder="72C-123.45" oninput="sheetData[${i}].bks=this.value;updateStats()" style="font-family:monospace;${!hasBks?'border-color:#f59e0b':''}"/></td>
+      <td>${badge}</td>
+      <td><button onclick="sheetData.splice(${i},1);renderSheet()" style="background:#450a0a;color:#f87171;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px">✕</button></td>
+    </tr>`;
+  });
+  updateStats();
+}
+
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+
+function updateStats(){
+  document.getElementById('st1').textContent=sheetData.length;
+  document.getElementById('st2').textContent=sheetData.filter(r=>r.sdt).length;
+  document.getElementById('st3').textContent=sheetData.filter(r=>r.bks).length;
+  document.getElementById('st4').textContent=sheetData.filter(r=>r.sdt&&r.tuyen).length;
+}
+
+function addRow(){sheetData.push({tuyen:'',ten:'',sdt:'',bks:''});renderSheet();}
+
+async function loadTrips(){
+  const base=document.getElementById('apiBase').value.trim();
+  const token=document.getElementById('bearerToken').value.trim();
+  const hub=document.getElementById('hubId').value.trim();
+  const ep=document.getElementById('epTrips').value.trim();
+  if(!base){alert('Vào tab ⚙ Cấu Hình API → nhập Base URL!');go('api');return;}
+  log('Gọi API: '+base+ep,'info');
+  try{
+    // process_from_to: hôm qua 00:00 → ngày mai 23:59 (rộng như GHN web gốc)
+    const now=new Date();
+    const dayStart=Math.floor(new Date(now.getFullYear(),now.getMonth(),now.getDate()-1,0,0,0).getTime()/1000);
+    const dayEnd=Math.floor(new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,23,59,59).getTime()/1000);
+    // Payload khớp hoàn toàn GHN web (không có partner_router_code)
+    const body_trips=JSON.stringify({
+      page:1,
+      status:["new","pending"],
+      partner_router_code: hub,
+      process_from_to:[dayStart, dayEnd],
+      type:4,
+      types:null
+    });
+    log('📤 Gửi request: PATCH '+base+ep+' | partner_router_code='+hub,'info');
+    const r=await fetch(base+ep,{method:'PATCH',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:body_trips});
+    if(!r.ok){
+      const errTxt=await r.text().catch(()=>'');
+      log('❌ Response lỗi: '+errTxt,'err');
+      throw new Error('HTTP '+r.status+': '+errTxt.slice(0,200));
+    }
+    const d=await r.json();
+    log('📥 Response trang 1: '+JSON.stringify(d).slice(0,200),'info');
+    const page1=d.data||d.trips||d.result||(Array.isArray(d)?d:[]);
+    const total=d.paging&&d.paging.total?d.paging.total:page1.length;
+    tripsData=[...page1];
+    log(`Trang 1: ${page1.length} chuyến / tổng ${total}`,'info');
+    // Load thêm các trang nếu còn
+    if(total>page1.length){
+      const pageSize=page1.length||25;
+      const totalPages=Math.ceil(total/pageSize);
+      for(let pg=2;pg<=totalPages&&pg<=20;pg++){
+        const bodyPg=JSON.stringify({
+          page:pg,
+          status:["new","pending"],
+          partner_router_code: hub,
+          process_from_to:[dayStart,dayEnd],type:4,types:null
+        });
+        const rPg=await fetch(base+ep,{method:'PATCH',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:bodyPg});
+        if(!rPg.ok) break;
+        const dPg=await rPg.json();
+        const rows=dPg.data||dPg.trips||dPg.result||(Array.isArray(dPg)?dPg:[]);
+        if(!rows.length) break;
+        tripsData=[...tripsData,...rows];
+        log(`Trang ${pg}: +${rows.length} chuyến (tổng: ${tripsData.length})`,'info');
+      }
+    }
+    log(`✅ ${tripsData.length} chuyến (partner_router_code=${hub})`,'ok');
+    // Hiện JSON của chuyến đầu tiên để debug field hub
+    if(tripsData.length>0){
+      const t0=tripsData[0];
+      log('🔍 Chuyến đầu tiên (trước lọc hub):','info');
+      log(`hub="${t0.hub}" | current_hub="${t0.current_hub}" | from_hub="${t0.from_hub}" | depot_code="${t0.depot_code}"`, 'info');
+      log(JSON.stringify(t0,null,2).slice(0,1200),'info');
+    }
+    renderTrips();
+    document.getElementById('btnMatch').disabled=false;
+  }catch(e){
+    log('Lỗi: '+e.message,'err');
+    document.getElementById('tripsWrap').innerHTML=`<div class="alert aw">❌ ${e.message}<br>→ Kiểm tra Base URL và Bearer Token, hoặc dùng "🧪 Chuyến Mẫu".</div>`;
+  }
+}
+
+function loadSample(){
+  tripsData=sheetData.map((r,i)=>({
+    trip_id:'T'+(100+i).toString(),
+    trip_code:r.tuyen,
+    route:r.tuyen,
+    status:'PENDING',
+    from:'Hub 1908',
+    to:r.tuyen.split('_')[0]
+  }));
+  tripsData.push({trip_id:'T999',trip_code:'HaNoi_S1_99',route:'HaNoi_S1_99',status:'PENDING',from:'Hub 1908',to:'Hà Nội'});
+  renderTrips();
+  document.getElementById('btnMatch').disabled=false;
+  log('Load '+tripsData.length+' chuyến mẫu (1 chuyến sẽ không khớp để demo)','ok');
+}
+
+function getCode(t){
+  // scheduler_name hoặc transport_route_code = tên tuyến để khớp với sheet
+  return t.scheduler_name||t.transport_route_code||t.router_path||t.route_code||t.trip_name||t.name||t.route||'';
+}
+function getTripId(t){
+  // code = mã chuyến thật để gán API
+  return t.code||t.trip_code||t.id||'';
+}
+
+function renderTrips(){
+  const w=document.getElementById('tripsWrap');
+  if(!tripsData.length){w.innerHTML='<div class="alert aw">Không có chuyến.</div>';return;}
+  // Show raw keys of first trip for debugging
+  const firstKeys=Object.keys(tripsData[0]||{}).join(', ');
+  let h=`<div class="alert ai" style="margin-bottom:10px;font-size:11px;font-family:monospace">🔍 Fields từ API: ${firstKeys}</div>`;
+  h+=`<div style="overflow-x:auto"><table><thead><tr>
+    <th>#</th><th>Mã Chuyến (trip_code)</th><th>Tên Tuyến (route_code/name)</th><th>Trạng thái</th>
+  </tr></thead><tbody>`;
+  tripsData.forEach((t,i)=>{
+    const tripId=getTripId(t);
+    const routeName=getCode(t);
+    h+=`<tr>
+      <td>${i+1}</td>
+      <td style="font-family:monospace;font-size:11px"><b>${tripId}</b></td>
+      <td style="color:#fbbf24;font-size:12px"><b>${routeName||'—'}</b>
+        <div style="font-size:10px;color:#64748b;margin-top:2px">
+          sched: ${t.scheduler_name||'—'} | route: ${t.transport_route_code||'—'}
+        </div>
+      </td>
+      <td><span class="badge by">${t.status||'PENDING'}</span></td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  w.innerHTML=h;
+}
+
+function norm(s){
+  return (s||'').trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // bỏ dấu tiếng Việt khi so sánh
+    .replace(/[\s\-\.\_]+/g,'_')
+    .replace(/^_|_$/g,'');
+}
+
+function doMatch(){
+  const map={};
+  sheetData.forEach(r=>{map[norm(r.tuyen)]=r;});
+  // Debug: in ra 5 tên tuyến CSV và 5 tên tuyến API để so sánh
+  const csvKeys=Object.keys(map).slice(0,5);
+  const apiNames=tripsData.slice(0,5).map(t=>norm(getCode(t)));
+  log('🔍 CSV norm: '+csvKeys.join(' | '),'info');
+  log('🔍 API norm: '+apiNames.join(' | '),'info');
+  matchPairs=tripsData.map(t=>{
+    const code=getCode(t); // tên tuyến để match với sheet
+    const tripId=getTripId(t); // mã chuyến để gán API
+    const driver=map[norm(code)]||null;
+    let status='no';
+    if(driver){
+      const hasInfo=driver.sdt&&driver.sdt.trim()&&driver.bks&&driver.bks.trim();
+      status=hasInfo?'ok':'incomplete';
+    }
+    return{trip:t,code,driver,status};
+  });
+  const ok=matchPairs.filter(p=>p.status==='ok').length;
+  const inc=matchPairs.filter(p=>p.status==='incomplete').length;
+  log(`Ghép xong: ${ok} đủ info, ${inc} thiếu SĐT/BKS, ${matchPairs.filter(p=>p.status==='no').length} không khớp`,ok>0?'ok':'warn');
+  if(inc>0) log(`⚠ ${inc} tuyến khớp tên nhưng THIẾU SĐT hoặc BKS → sẽ bị bỏ qua khi gán!`,'warn');
+  document.getElementById('astats').style.display='flex';
+  updAStats();
+  renderMatch();
+  go('assign');
+}
+
+function renderMatch(){
+  document.getElementById('matchCard').style.display='block';
+  let h=`<table><thead><tr>
+    <th>Mã Tuyến API</th><th>Tên Tài Xế</th><th>Số ĐT</th><th>BKS Xe</th><th>Ghép</th><th>Kết quả</th>
+  </tr></thead><tbody>`;
+  matchPairs.forEach(p=>{
+    const ok=p.status==='ok';
+    const inc=p.status==='incomplete';
+    const res=assignRes[p.code];
+    h+=`<tr class="${ok?'mok':inc?'mwarn':''}" style="${inc?'background:#450a0a18':!ok?'background:#1a2e4422':''}">
+      <td><b>${p.code}</b></td>
+      <td>${ok?p.driver.ten:'—'}</td>
+      <td style="font-family:monospace">${ok?p.driver.sdt:'—'}</td>
+      <td>${ok&&p.driver.bks?`<span class="badge bb">${p.driver.bks}</span>`:(ok?'<span style="color:#64748b;font-size:11px">Chưa có BKS</span>':'—')}</td>
+      <td>${p.status==='ok'?'<span class="badge bg">✅ Đủ info</span>':p.status==='incomplete'?'<span class="badge br">❌ Thiếu SĐT/BKS</span>':'<span class="badge by">⚠ Không khớp tuyến</span>'}</td>
+      <td>${res?`<span class="badge ${res.ok?'bg':'br'}">${res.ok?'Gán OK':'❌ Lỗi'}</span>`:'<span class="badge bgr">Chờ</span>'}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('matchWrap').innerHTML=h;
+}
+
+function updAStats(){
+  document.getElementById('a1').textContent=matchPairs.length;
+  document.getElementById('a2').textContent=matchPairs.filter(p=>p.status==='ok').length;
+  document.getElementById('a3').textContent=matchPairs.filter(p=>p.status==='no'||p.status==='incomplete').length;
+  document.getElementById('a4').textContent=Object.values(assignRes).filter(r=>r.ok).length;
+}
+
+function buildBody(p, hub){
+  const tpl=document.getElementById('bodyTemplate').value;
+  return tpl
+    .replace('{{tuyen}}',  p.code)
+    .replace('{{trip_id}}',p.trip.trip_id||p.trip.id||'')
+    .replace('{{sdt}}',    p.driver.sdt)
+    .replace('{{ten}}',    p.driver.ten)
+    .replace('{{bks}}',    p.driver.bks||'')
+    .replace('{{hub_id}}', hub);
+}
+
+// ===== LOOKUP HELPERS =====
+async function findDriverId(base, token, sdt, hub){
+  // GET /api/v2/public/driver/find?search_field={sdt}&hub=LHCM&is_actived=true&status=1&offset=0&limit=5
+  // Gửi số điện thoại không cần số 0 đầu
+  const sdtSearch=sdt.replace(/\D/g,'').replace(/^0/,'');
+  const url=`${base}/api/v2/public/driver/find?offset=0&limit=5&is_actived=true&status=1&hub=${hub}&search_field=${encodeURIComponent(sdtSearch)}`;
+  const r=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
+  if(!r.ok) throw new Error('Tìm tài xế HTTP '+r.status);
+  const d=await r.json();
+  const list=d.data||d.drivers||d||[];
+  if(!list.length) throw new Error('Không tìm thấy tài xế SĐT: '+sdt);
+  // Match by phone
+  const sdtClean=sdt.replace(/\D/g,'').slice(-9);
+  const found=list.find(x=>(x.phone||'').replace(/\D/g,'').endsWith(sdtClean))||list[0];
+  return {id: found.id, fullname: found.fullname||found.full_name||found.name||'', phone: found.phone||''};
+}
+
+async function findTruckId(base, token, bks, hub){
+  // Try common truck search endpoint
+  // Chỉ cần 5 số cuối BKS
+  const bksSearch=(bks||'').replace(/[\s\-\.]/g,'').slice(-5);
+  const url=`${base}/api/v2/public/truck/find?offset=0&limit=5&hub=${hub}&search_field=${encodeURIComponent(bksSearch)}&is_actived=true`;
+  const r=await fetch(url,{headers:{'Authorization':'Bearer '+token}});
+  if(!r.ok) throw new Error('Tìm xe HTTP '+r.status);
+  const d=await r.json();
+  const list=d.data||d.trucks||d||[];
+  if(!list.length) throw new Error('Không tìm thấy xe BKS: '+bks);
+  log('   [debug] API trả về '+list.length+' xe: '+JSON.stringify(list.map(x=>({id:x.id, id_number:x.id_number, plate:x.plate}))), 'info');
+  const normPlate=s=>(s||'').replace(/[\s\-\.]/g,'').toUpperCase();
+  const bksLast5=normPlate(bks).slice(-5);
+  const found=list.find(x=>normPlate(x.id_number||x.plate||'').endsWith(bksLast5));
+  if(!found) throw new Error('Không tìm thấy xe khớp đúng BKS: '+bks+' (hệ thống trả về xe khác, đã bỏ qua để tránh gán nhầm)');
+  return {id: found.id, id_number: found.id_number||found.plate||bks};
+}
+
+async function startAssign(){
+  const pairs=matchPairs.filter(p=>p.status==='ok');
+  const skipped=matchPairs.filter(p=>p.status==='incomplete');
+  if(!pairs.length){
+    if(skipped.length) alert(`Có ${skipped.length} tuyến khớp tên nhưng THIẾU SĐT hoặc BKS!\nVui lòng bổ sung thông tin trong tab "Dữ Liệu Tài Xế" trước.`);
+    else alert('Không có tuyến nào khớp để gán!');
+    return;
+  }
+  if(skipped.length){
+    const cont=confirm(`⚠ Cảnh báo: ${skipped.length} tuyến thiếu SĐT/BKS sẽ bị BỎ QUA.\nChỉ gán ${pairs.length} tuyến đủ thông tin.\nTiếp tục?`);
+    if(!cont) return;
+    skipped.forEach(p=>log(`⏭ Bỏ qua "${p.code}" — thiếu SĐT/BKS`,'warn'));
+  }
+
+  const base=document.getElementById('apiBase').value.trim();
+  const token=document.getElementById('bearerToken').value.trim();
+  const hub='LHCM'; // hub code for API queries
+  const epAssign='/api/v1/staff/trip/express/assign/';
+
+  document.getElementById('progCard').style.display='block';
+  document.getElementById('btnGan').disabled=true;
+  log(`▶ Bắt đầu phân bổ ${pairs.length} chuyến (3 bước/chuyến: tìm TX → tìm xe → gán)`,'info');
+
+  for(let i=0;i<pairs.length;i++){
+    const p=pairs[i];
+    document.getElementById('pbar').style.width=Math.round(i/pairs.length*100)+'%';
+    document.getElementById('progTxt').textContent=`(${i+1}/${pairs.length}) ${p.code} → ${p.driver.ten}`;
+    document.getElementById('progCnt').textContent=i+' / '+pairs.length+' xong';
+
+    if(!base){
+      // Giả lập
+      await new Promise(r=>setTimeout(r,400));
+      assignRes[p.code]={ok:true};
+      log(`✅ [GIẢ LẬP] ${p.code} → ${p.driver.ten} | SĐT: ${p.driver.sdt} | BKS: ${p.driver.bks}`,'ok');
+    } else {
+      try{
+        // BƯỚC 1: Tìm driver_id theo SĐT
+        log(`🔍 [1/3] Tìm tài xế theo SĐT: ${p.driver.sdt}`,'info');
+        const driverObj = await findDriverId(base, token, p.driver.sdt, hub);
+        log(`   → Tìm thấy: ${driverObj.fullname} (id: ${driverObj.id})`,'ok');
+
+        // BƯỚC 2: Tìm truck_id theo BKS
+        log(`🔍 [2/3] Tìm xe theo BKS: ${p.driver.bks}`,'info');
+        const truckObj = await findTruckId(base, token, p.driver.bks, hub);
+        log(`   → Tìm thấy xe: ${truckObj.id_number} (id: ${truckObj.id})`,'ok');
+
+        // BƯỚC 3: Gán vào chuyến
+        log(`🚀 [3/3] Gán vào chuyến: ${p.code}`,'info');
+        const assignBody = JSON.stringify({
+          driver: { id: driverObj.id, fullname: driverObj.fullname },
+          truck:  { id: truckObj.id,  id_number: truckObj.id_number }
+        });
+        const assignUrl = base + epAssign + getTripId(p.trip); // dùng trip_code/id thật
+        const r = await fetch(assignUrl, {
+          method: 'PUT',
+          headers: {'Authorization':'Bearer '+token, 'Content-Type':'application/json'},
+          body: assignBody
+        });
+        if(!r.ok){
+          const txt=await r.text().catch(()=>'');
+          throw new Error(`HTTP ${r.status}: ${txt.slice(0,120)}`);
+        }
+        assignRes[p.code]={ok:true};
+        log(`✅ XONG: ${p.code} → ${p.driver.ten} (${p.driver.sdt}) | Xe: ${p.driver.bks}`,'ok');
+      }catch(e){
+        assignRes[p.code]={ok:false,msg:e.message};
+        log(`❌ LỖI: ${p.code} — ${e.message}`,'err');
+      }
+    }
+    await new Promise(r=>setTimeout(r,500));
+  }
+
+  document.getElementById('pbar').style.width='100%';
+  document.getElementById('progTxt').textContent='✅ Hoàn tất!';
+  document.getElementById('progCnt').textContent=pairs.length+'/'+pairs.length+' đã xử lý';
+  document.getElementById('btnGan').disabled=false;
+  updAStats();
+  renderMatch();
+  const okC=Object.values(assignRes).filter(r=>r.ok).length;
+  log(`🎉 KẾT THÚC: ${okC}/${pairs.length} tuyến gán thành công`,okC===pairs.length?'ok':'warn');
+}
+
+renderSheet();
+</script>
+</body>
+</html>
